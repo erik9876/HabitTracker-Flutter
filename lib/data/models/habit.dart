@@ -10,7 +10,17 @@ class Habit {
 
   Habit({required this.name, List<DateTime>? completedDates, String? id})
       : id = id ?? const Uuid().v4(),
-        completedDates = completedDates ?? [];
+        completedDates = completedDates ??
+            [
+              DateTime(2024, 5, 31),
+              DateTime(2024, 5, 30),
+              DateTime(2024, 5, 29),
+              DateTime(2024, 5, 28),
+              DateTime(2024, 5, 27),
+              DateTime(2024, 5, 26),
+              DateTime(2024, 5, 25),
+              DateTime(2024, 5, 24),
+            ];
 
   void completeHabit() {
     // Add the current date to the completedDates list

@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:habit_tracker/data/models/habit.dart';
+import 'package:habit_tracker/components/custom_calendar.dart'; // Importieren Sie die CustomCalendar
 
 class HabitDetailScreen extends StatefulWidget {
   final Habit habit;
@@ -38,17 +39,8 @@ class _HabitDetailScreenState extends State<HabitDetailScreen> {
                 const SizedBox(height: 10),
                 const Text('Completed Dates:', style: TextStyle(fontSize: 18)),
                 const SizedBox(height: 10),
-                Expanded(
-                  child: ListView.builder(
-                    itemCount: widget.habit.completedDates.length,
-                    itemBuilder: (context, index) {
-                      return ListTile(
-                        title: Text(widget.habit.completedDates[index]
-                            .toLocal()
-                            .toString()),
-                      );
-                    },
-                  ),
+                Card(
+                  child: CustomCalendar(habit: widget.habit),
                 ),
               ],
             ),
