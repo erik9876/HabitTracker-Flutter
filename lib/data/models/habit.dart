@@ -16,11 +16,21 @@ class Habit {
               DateTime(2024, 5, 30),
               DateTime(2024, 5, 29),
               DateTime(2024, 5, 28),
-              DateTime(2024, 5, 27),
               DateTime(2024, 5, 26),
               DateTime(2024, 5, 25),
               DateTime(2024, 5, 24),
             ];
+
+  int getStreakDays() {
+    DateTime today = truncateDate(DateTime.now());
+    int streakCount = completedDates.contains(today) ? 1 : 0;
+    DateTime yesterday = truncateDate(today.subtract(const Duration(days: 1)));
+    while (completedDates.contains(yesterday)) {
+      streakCount += 1;
+      yesterday = truncateDate(yesterday.subtract(const Duration(days: 1)));
+    }
+    return streakCount;
+  }
 
   void completeHabit() {
     // Add the current date to the completedDates list

@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:habit_tracker/components/habit_streak.dart';
 import 'package:habit_tracker/data/models/habit.dart';
 import 'package:habit_tracker/components/custom_calendar.dart'; // Importieren Sie die CustomCalendar
 
@@ -36,6 +37,16 @@ class _HabitDetailScreenState extends State<HabitDetailScreen> {
                 const SizedBox(height: 10),
                 Text('Name: ${widget.habit.name}',
                     style: const TextStyle(fontSize: 18)),
+                const SizedBox(height: 10),
+                Row(
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    const Text('Current Streak:',
+                      style: TextStyle(fontSize: 18)),
+                    const SizedBox(width: 10),
+                    HabitStreak(habit: widget.habit)
+                  ],
+                ),
                 const SizedBox(height: 10),
                 const Text('Completed Dates:', style: TextStyle(fontSize: 18)),
                 const SizedBox(height: 10),

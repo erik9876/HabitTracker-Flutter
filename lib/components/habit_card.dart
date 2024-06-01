@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:habit_tracker/components/habit_streak.dart';
 import 'package:habit_tracker/data/models/habit.dart';
 
 class HabitCard extends StatelessWidget {
@@ -14,6 +15,7 @@ class HabitCard extends StatelessWidget {
         padding: const EdgeInsets.all(8.0),
         child: ListTile(
           title: Text(habit.name),
+          trailing: HabitStreak(habit: habit)
         ),
       ),
     );
