@@ -1,8 +1,31 @@
 import 'package:flutter/material.dart';
-import 'package:shared_preferences/shared_preferences.dart';
+import 'package:habit_tracker/data/models/habit.dart';
+import 'package:habit_tracker/data/repositories/habit_manager.dart';
+import 'package:habit_tracker/screens/habit_list_screen.dart';
+import 'dart:developer';
 
-void main() {
+void main() async {
+  WidgetsFlutterBinding.ensureInitialized();
+  await initializeSampleHabits();
   runApp(const MyApp());
+}
+
+Future<void> initializeSampleHabits() async {
+  List<Habit> existingHabits = await HabitManager.loadHabits();
+  if (existingHabits.isEmpty) {
+    List<Habit> sampleHabits = [
+      Habit(name: 'Exercise'),
+      Habit(name: 'Meditate'),
+      Habit(name: 'Read a book'),
+    ];
+
+    for (Habit habit in sampleHabits) {
+      await habit.saveHabit();
+    }
+    log('Sample habits initialized.');
+  } else {
+    log('Habits already exist.');
+  }
 }
 
 class MyApp extends StatelessWidget {
@@ -20,69 +43,7 @@ class MyApp extends StatelessWidget {
         brightness: Brightness.dark,
       ),
       themeMode: ThemeMode.system,
-      home: const MyHomePage(title: 'Flutter Demo Home Page'),
-    );
-  }
-}
-
-class MyHomePage extends StatefulWidget {
-  const MyHomePage({super.key, required this.title});
-
-  final String title;
-
-  @override
-  State<MyHomePage> createState() => _MyHomePageState();
-}
-
-class _MyHomePageState extends State<MyHomePage> {
-  int _counter = 0;
-
-  @override
-  void initState() {
-    super.initState();
-    _loadCounter();
-  }
-
-  void _loadCounter() async {
-    SharedPreferences prefs = await SharedPreferences.getInstance();
-    setState(() {
-      _counter = (prefs.getInt('counter') ?? 0);
-    });
-  }
-
-  void _incrementCounter() async {
-    SharedPreferences prefs = await SharedPreferences.getInstance();
-    setState(() {
-      _counter++;
-      prefs.setInt('counter', _counter);
-    });
-  }
-
-  @override
-  Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: AppBar(
-        title: Text(widget.title),
-      ),
-      body: Center(
-        child: Column(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: <Widget>[
-            const Text(
-              'You have pushed the button this many times:',
-            ),
-            Text(
-              '$_counter',
-              style: Theme.of(context).textTheme.headlineMedium,
-            ),
-          ],
-        ),
-      ),
-      floatingActionButton: FloatingActionButton(
-        onPressed: _incrementCounter,
-        tooltip: 'Increment',
-        child: const Icon(Icons.add),
-      ),
+      home: const HabitListScreen(),
     );
   }
 }
