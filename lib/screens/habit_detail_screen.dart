@@ -57,7 +57,7 @@ class _HabitDetailScreenState extends State<HabitDetailScreen> {
             ),
           ),
           Positioned(
-            bottom: 16,
+            bottom: 10,
             left: 16,
             right: 16,
             child: ElevatedButton(
