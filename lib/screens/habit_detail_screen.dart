@@ -32,17 +32,11 @@ class _HabitDetailScreenState extends State<HabitDetailScreen> {
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                Text('Habit ID: ${widget.habit.id}',
-                    style: const TextStyle(fontSize: 18)),
-                const SizedBox(height: 10),
-                Text('Name: ${widget.habit.name}',
-                    style: const TextStyle(fontSize: 18)),
-                const SizedBox(height: 10),
                 Row(
                   mainAxisSize: MainAxisSize.min,
                   children: [
                     const Text('Current Streak:',
-                      style: TextStyle(fontSize: 18)),
+                        style: TextStyle(fontSize: 18)),
                     const SizedBox(width: 10),
                     HabitStreak(habit: widget.habit)
                   ],
@@ -51,7 +45,10 @@ class _HabitDetailScreenState extends State<HabitDetailScreen> {
                 const Text('Completed Dates:', style: TextStyle(fontSize: 18)),
                 const SizedBox(height: 10),
                 Card(
-                  child: CustomCalendar(habit: widget.habit),
+                  child: Padding(
+                    padding: const EdgeInsets.all(10),
+                    child: CustomCalendar(habit: widget.habit),
+                  ),
                 ),
               ],
             ),

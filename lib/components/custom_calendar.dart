@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:table_calendar/table_calendar.dart';
 import 'package:habit_tracker/data/models/habit.dart';
+import 'package:intl/intl.dart';
 
 class CustomCalendar extends StatefulWidget {
   final Habit habit;
@@ -23,6 +24,9 @@ class _CustomCalendarState extends State<CustomCalendar> {
       focusedDay: _focusedDay,
       calendarFormat: _calendarFormat,
       startingDayOfWeek: StartingDayOfWeek.monday,
+      availableCalendarFormats: const {
+        CalendarFormat.month: 'Month',
+      },
       onFormatChanged: (format) {
         setState(() {
           _calendarFormat = format;
@@ -31,18 +35,73 @@ class _CustomCalendarState extends State<CustomCalendar> {
       onPageChanged: (focusedDay) {
         _focusedDay = focusedDay;
       },
-      calendarStyle: const CalendarStyle(
+      calendarStyle: CalendarStyle(
+        defaultDecoration: BoxDecoration(
+          color: Colors.white.withOpacity(0.15),
+          shape: BoxShape.circle,
+        ),
+        weekendDecoration: BoxDecoration(
+          color: Colors.white.withOpacity(0.15),
+          shape: BoxShape.circle,
+        ),
+        weekendTextStyle: const TextStyle(color: Colors.white),
         outsideDaysVisible: false,
       ),
       headerStyle: const HeaderStyle(
         formatButtonVisible: false,
         titleCentered: true,
+        leftChevronVisible: false,
+        rightChevronVisible: false,
+        titleTextStyle: TextStyle(fontWeight: FontWeight.bold, fontSize: 20),
       ),
       daysOfWeekStyle: const DaysOfWeekStyle(
         weekdayStyle: TextStyle(color: Colors.white),
         weekendStyle: TextStyle(color: Colors.white),
       ),
       calendarBuilders: CalendarBuilders(
+        headerTitleBuilder: (context, date) {
+          return Row(
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            children: [
+              Padding(
+                padding: const EdgeInsets.only(left: 8),
+                child: Text(
+                  DateFormat('MMMM y').format(_focusedDay),
+                  style: const TextStyle(
+                      fontWeight: FontWeight.bold,
+                      fontSize: 20,
+                      color: Colors.white),
+                ),
+              ),
+              Row(
+                children: [
+                  GestureDetector(
+                    onTap: () {
+                      setState(() {
+                        _focusedDay = DateTime(
+                          _focusedDay.year,
+                          _focusedDay.month - 1,
+                        );
+                      });
+                    },
+                    child: const Icon(Icons.chevron_left, color: Colors.white),
+                  ),
+                  GestureDetector(
+                    onTap: () {
+                      setState(() {
+                        _focusedDay = DateTime(
+                          _focusedDay.year,
+                          _focusedDay.month + 1,
+                        );
+                      });
+                    },
+                    child: const Icon(Icons.chevron_right, color: Colors.white),
+                  ),
+                ],
+              ),
+            ],
+          );
+        },
         defaultBuilder: (context, date, focusedDay) {
           bool isCompleted = widget.habit.completedDates.any(
             (completedDate) => isSameDay(completedDate, date),
@@ -88,8 +147,8 @@ class _CustomCalendarState extends State<CustomCalendar> {
             return Container(
               margin: const EdgeInsets.all(6.0),
               decoration: BoxDecoration(
-                color: Colors.white.withOpacity(0.15),
                 shape: BoxShape.circle,
+                border: Border.all(color: Colors.white.withOpacity(0.3)),
               ),
               child: Center(
                 child: Text(

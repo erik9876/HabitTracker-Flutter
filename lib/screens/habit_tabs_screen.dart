@@ -34,13 +34,11 @@ class _HabitTabsScreenState extends State<HabitTabsScreen>
     _tabController?.removeListener(_handleTabSelection);
     _tabController?.dispose();
     _tabController = TabController(length: _habits.length, vsync: this);
-    _tabController?.addListener(_handleTabSelection);
+    _tabController!.addListener(_handleTabSelection);
   }
 
   void _handleTabSelection() {
-    if (!_tabController!.indexIsChanging) {
-      setState(() {});
-    }
+    setState(() {}); // Ensure state updates immediately
   }
 
   @override
@@ -51,6 +49,7 @@ class _HabitTabsScreenState extends State<HabitTabsScreen>
 
   @override
   void dispose() {
+    _tabController?.removeListener(_handleTabSelection);
     _tabController?.dispose();
     super.dispose();
   }
@@ -76,9 +75,6 @@ class _HabitTabsScreenState extends State<HabitTabsScreen>
     }
 
     return Scaffold(
-      appBar: AppBar(
-        title: const Text('Habit Tracker'),
-      ),
       body: Column(
         children: [
           Expanded(
