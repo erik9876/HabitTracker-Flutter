@@ -37,6 +37,19 @@ class Habit {
     }
   }
 
+  void completeForgottenHabit(DateTime date) {
+    // Add the given date to the completedDates list
+
+    date = truncateDate(date);
+    if (!completedDates.contains(date) && date.isBefore(DateTime.now())) {
+      completedDates.add(date);
+      completedDates.sort();
+      saveHabit();
+    } else {
+      log('Habit already completed on $date');
+    }
+  }
+
   Future<void> saveHabit() async {
     // Save the habit to the local storage
     SharedPreferences prefs = await SharedPreferences.getInstance();

@@ -35,6 +35,10 @@ class _CustomCalendarState extends State<CustomCalendar> {
       onPageChanged: (focusedDay) {
         _focusedDay = focusedDay;
       },
+      onDayLongPressed: (selectedDay, focusedDay) {
+        widget.habit.completeForgottenHabit(selectedDay);
+        setState(() {});
+      },
       calendarStyle: CalendarStyle(
         defaultDecoration: BoxDecoration(
           color: Colors.white.withOpacity(0.15),
