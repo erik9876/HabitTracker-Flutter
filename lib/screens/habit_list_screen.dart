@@ -3,7 +3,7 @@ import 'package:habit_tracker/components/habit_card.dart';
 import 'package:habit_tracker/components/habit_input_card.dart';
 import 'package:habit_tracker/data/models/habit.dart';
 import 'package:habit_tracker/data/repositories/habit_manager.dart';
-import 'package:habit_tracker/screens/habit_detail_screen.dart';
+import 'package:habit_tracker/screens/habit_tabs_screen.dart';
 import 'dart:developer';
 
 class HabitListScreen extends StatefulWidget {
@@ -21,6 +21,12 @@ class _HabitListScreenState extends State<HabitListScreen> {
   @override
   void initState() {
     super.initState();
+    loadHabits();
+  }
+
+  @override
+  void didChangeDependencies() {
+    super.didChangeDependencies();
     loadHabits();
   }
 
@@ -64,6 +70,36 @@ class _HabitListScreenState extends State<HabitListScreen> {
     });
   }
 
+  void _reorderHabits(int oldIndex, int newIndex) {
+    setState(() {
+      if (newIndex > oldIndex) {
+        newIndex -= 1;
+      }
+      final Habit habit = habits.removeAt(oldIndex);
+      habits.insert(newIndex, habit);
+      HabitManager.saveHabitOrder(habits);
+    });
+  }
+
+  Route _openListScreen(int habitIndex) {
+    return PageRouteBuilder(
+      pageBuilder: (context, animation, secondaryAnimation) =>
+          HabitTabsScreen(initialIndex: habitIndex),
+      transitionsBuilder: (context, animation, secondaryAnimation, child) {
+        const begin = Offset(0.0, 1.0);
+        const end = Offset.zero;
+        var curve = Curves.ease;
+        final tween =
+            Tween(begin: begin, end: end).chain(CurveTween(curve: curve));
+
+        return SlideTransition(
+          position: animation.drive(tween),
+          child: child,
+        );
+      },
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     return GestureDetector(
@@ -75,23 +111,28 @@ class _HabitListScreenState extends State<HabitListScreen> {
       child: Scaffold(
         appBar: AppBar(
           title: const Text('Habit List'),
+          titleTextStyle: const TextStyle(
+            fontFamily: 'Montserrat',
+            fontWeight: FontWeight.w700,
+            fontSize: 24,
+          ),
         ),
-        body: ListView.builder(
-          itemCount: habits.length + (isAddingNewHabit ? 1 : 0),
-          itemBuilder: (context, index) {
-            if (isAddingNewHabit && index == 0) {
-              return HabitInputCard(
+        body: ReorderableListView(
+          onReorder: _reorderHabits,
+          children: [
+            if (isAddingNewHabit)
+              HabitInputCard(
+                key: ValueKey('input_card'),
                 habitNameController: _habitNameController,
                 onSave: _saveHabit,
                 onCancel: _cancelAddHabit,
-              );
-            } else {
-              final habitIndex = isAddingNewHabit ? index - 1 : index;
-              return Dismissible(
-                key: ValueKey(habits[habitIndex].id),
+              ),
+            for (int index = 0; index < habits.length; index++)
+              Dismissible(
+                key: ValueKey(habits[index].id),
                 direction: DismissDirection.endToStart,
                 onDismissed: (direction) {
-                  _deleteHabit(habits[habitIndex]);
+                  _deleteHabit(habits[index]);
                 },
                 background: Container(
                   color: Colors.red,
@@ -103,24 +144,21 @@ class _HabitListScreenState extends State<HabitListScreen> {
                   ),
                 ),
                 child: GestureDetector(
-                  onTap: () {
+                  onTap: () async {
                     if (!isAddingNewHabit) {
-                      Navigator.push(
-                        context,
-                        MaterialPageRoute(
-                          builder: (context) =>
-                              HabitDetailScreen(habit: habits[habitIndex]),
-                        ),
-                      );
+                      var result = await Navigator.of(context)
+                          .push(_openListScreen(index));
+                      if (result == 'reload') {
+                        loadHabits();
+                      }
                     } else {
                       _cancelAddHabit();
                     }
                   },
-                  child: HabitCard(habit: habits[habitIndex]),
+                  child: HabitCard(habit: habits[index]),
                 ),
-              );
-            }
-          },
+              ),
+          ],
         ),
         floatingActionButton: FloatingActionButton(
           onPressed: _addHabit,
