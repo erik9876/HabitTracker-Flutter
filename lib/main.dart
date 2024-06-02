@@ -36,11 +36,12 @@ class MyApp extends StatelessWidget {
     return MaterialApp(
       title: 'Habit Tracker',
       theme: ThemeData(
-        primarySwatch: Colors.blue,
         brightness: Brightness.light,
+        fontFamily: 'Montserrat',
       ),
       darkTheme: ThemeData(
         brightness: Brightness.dark,
+        fontFamily: 'Montserrat',
       ),
       themeMode: ThemeMode.system,
       home: const HabitTabsScreen(),
