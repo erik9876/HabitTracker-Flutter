@@ -5,7 +5,9 @@ import 'package:habit_tracker/screens/habit_detail_screen.dart';
 import 'package:habit_tracker/screens/habit_list_screen.dart';
 
 class HabitTabsScreen extends StatefulWidget {
-  const HabitTabsScreen({super.key});
+  final int initialIndex;
+
+  const HabitTabsScreen({super.key, required this.initialIndex});
 
   @override
   State<HabitTabsScreen> createState() => _HabitTabsScreenState();
@@ -33,7 +35,11 @@ class _HabitTabsScreenState extends State<HabitTabsScreen>
   void _updateTabController() {
     _tabController?.removeListener(_handleTabSelection);
     _tabController?.dispose();
-    _tabController = TabController(length: _habits.length, vsync: this);
+    _tabController = TabController(
+      length: _habits.length,
+      vsync: this,
+      initialIndex: widget.initialIndex,
+    );
     _tabController!.addListener(_handleTabSelection);
   }
 
@@ -55,10 +61,7 @@ class _HabitTabsScreenState extends State<HabitTabsScreen>
   }
 
   void _navigateToListScreen() {
-    Navigator.push(
-      context,
-      MaterialPageRoute(builder: (context) => const HabitListScreen()),
-    ).then((_) => _loadHabits());
+    Navigator.of(context).pop('reload');
   }
 
   @override
@@ -66,6 +69,7 @@ class _HabitTabsScreenState extends State<HabitTabsScreen>
     if (_habits.isEmpty || _tabController == null) {
       return Scaffold(
         appBar: AppBar(
+          leading: null,
           title: const Text('Habit Tracker'),
         ),
         body: const Center(

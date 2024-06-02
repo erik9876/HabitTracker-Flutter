@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:habit_tracker/data/models/habit.dart';
 import 'package:habit_tracker/data/repositories/habit_manager.dart';
+import 'package:habit_tracker/screens/habit_list_screen.dart';
 import 'dart:developer';
-import 'package:habit_tracker/screens/habit_tabs_screen.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -44,7 +44,7 @@ class MyApp extends StatelessWidget {
         fontFamily: 'Montserrat',
       ),
       themeMode: ThemeMode.system,
-      home: const HabitTabsScreen(),
+      home: const HabitListScreen(),
     );
   }
 }
