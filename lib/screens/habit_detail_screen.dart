@@ -61,14 +61,26 @@ class _HabitDetailScreenState extends State<HabitDetailScreen> {
             child: ElevatedButton(
               onPressed: _completeHabit,
               style: ButtonStyle(
-                backgroundColor: WidgetStateProperty.resolveWith<Color>((states) {
-                  return widget.habit.isDateCompleted(DateTime.now()) ? Colors.white.withOpacity(0.1) : Colors.orange;
-                }),
-                foregroundColor: WidgetStateProperty.resolveWith<Color>((states) {
-                  return widget.habit.isDateCompleted(DateTime.now()) ? Colors.white : Colors.black;
-                }),
+                backgroundColor: WidgetStateProperty.resolveWith<Color>(
+                  (states) {
+                    return widget.habit.isDateCompleted(DateTime.now())
+                        ? Colors.white.withOpacity(0.1)
+                        : widget.habit.color;
+                  },
+                ),
+                foregroundColor: WidgetStateProperty.resolveWith<Color>(
+                  (states) {
+                    return widget.habit.isDateCompleted(DateTime.now())
+                        ? Colors.white
+                        : Colors.black;
+                  },
+                ),
               ),
-              child: Text(widget.habit.isDateCompleted(DateTime.now()) ? 'Already done' : 'Complete for today'),
+              child: Text(
+                widget.habit.isDateCompleted(DateTime.now())
+                    ? 'Already done'
+                    : 'Complete for today',
+              ),
             ),
           ),
         ],

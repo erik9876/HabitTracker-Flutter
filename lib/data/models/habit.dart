@@ -1,16 +1,30 @@
 import 'dart:developer';
 import 'dart:convert';
+import 'dart:math' as math;
 import 'package:uuid/uuid.dart';
+import 'package:flutter/material.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 class Habit {
   final String id;
   String name;
   List<DateTime> completedDates;
+  Color color;
 
   Habit({required this.name, List<DateTime>? completedDates, String? id})
       : id = id ?? const Uuid().v4(),
-        completedDates = completedDates ?? [];
+        completedDates = completedDates ?? [],
+        color = getRandomColor();
+
+  static Color getRandomColor() {
+    final random = math.Random();
+    return Color.fromARGB(
+      255,
+      random.nextInt(256),
+      random.nextInt(256),
+      random.nextInt(256),
+    );
+  }
 
   int getStreakDays() {
     DateTime today = truncateDate(DateTime.now());
@@ -46,7 +60,8 @@ class Habit {
     // Add the given date to the completedDates list
 
     date = truncateDate(date);
-    if (!completedDates.contains(date) && date.isBefore(DateTime.now())) {
+    if (!completedDates.contains(date) &&
+        date.isBefore(truncateDate(DateTime.now()))) {
       completedDates.add(date);
       completedDates.sort();
       saveHabit();

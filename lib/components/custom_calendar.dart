@@ -116,8 +116,8 @@ class _CustomCalendarState extends State<CustomCalendar> {
           if (isCompleted) {
             return Container(
               margin: const EdgeInsets.all(6.0),
-              decoration: const BoxDecoration(
-                color: Colors.orange,
+              decoration: BoxDecoration(
+                color: widget.habit.color,
                 shape: BoxShape.circle,
               ),
               child: Center(
@@ -139,9 +139,8 @@ class _CustomCalendarState extends State<CustomCalendar> {
             return Container(
               margin: const EdgeInsets.all(6.0),
               decoration: BoxDecoration(
-                color: Colors.orange,
+                color: widget.habit.color,
                 shape: BoxShape.circle,
-                border: Border.all(color: Colors.white),
               ),
               child: Center(
                 child: Text(
