@@ -37,6 +37,11 @@ class Habit {
     }
   }
 
+  bool isDateCompleted(DateTime date) {
+    var truncatedDate = truncateDate(date);
+    return completedDates.contains(truncatedDate);
+  }
+
   void completeForgottenHabit(DateTime date) {
     // Add the given date to the completedDates list
 
