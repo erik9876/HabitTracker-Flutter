@@ -56,18 +56,20 @@ class Habit {
     return completedDates.contains(truncatedDate);
   }
 
-  void completeForgottenHabit(DateTime date) {
-    // Add the given date to the completedDates list
-
+  void togglePastDate(DateTime date) {
+    // Toggle the completion of the given date
+    if (date.isAfter(DateTime.now())) {
+      log('You can only toggle past dates');
+      return;
+    }
     date = truncateDate(date);
-    if (!completedDates.contains(date) &&
-        date.isBefore(truncateDate(DateTime.now()))) {
+    if (completedDates.contains(date)) {
+      completedDates.remove(date);
+    } else {
       completedDates.add(date);
       completedDates.sort();
-      saveHabit();
-    } else {
-      log('Habit already completed on $date');
     }
+    saveHabit();
   }
 
   Future<void> saveHabit() async {

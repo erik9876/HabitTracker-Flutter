@@ -5,8 +5,10 @@ import 'package:intl/intl.dart';
 
 class CustomCalendar extends StatefulWidget {
   final Habit habit;
+  final VoidCallback onDayLongPressed;
 
-  const CustomCalendar({super.key, required this.habit});
+  const CustomCalendar(
+      {super.key, required this.habit, required this.onDayLongPressed});
 
   @override
   State<CustomCalendar> createState() => _CustomCalendarState();
@@ -37,8 +39,8 @@ class _CustomCalendarState extends State<CustomCalendar> {
       },
       onDayLongPressed: (selectedDay, focusedDay) {
         if (!isSameDay(selectedDay, DateTime.now())) {
-          widget.habit.completeForgottenHabit(selectedDay);
-          setState(() {});
+          widget.habit.togglePastDate(selectedDay);
+          widget.onDayLongPressed();
         }
       },
       calendarStyle: CalendarStyle(

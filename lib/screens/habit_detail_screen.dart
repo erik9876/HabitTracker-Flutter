@@ -19,6 +19,10 @@ class _HabitDetailScreenState extends State<HabitDetailScreen> {
     });
   }
 
+  void _onDayLongPressedCallback() {
+    setState(() {});
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -48,7 +52,10 @@ class _HabitDetailScreenState extends State<HabitDetailScreen> {
                 Card(
                   child: Padding(
                     padding: const EdgeInsets.all(10),
-                    child: CustomCalendar(habit: widget.habit),
+                    child: CustomCalendar(
+                      habit: widget.habit,
+                      onDayLongPressed: _onDayLongPressedCallback,
+                    ),
                   ),
                 ),
               ],
