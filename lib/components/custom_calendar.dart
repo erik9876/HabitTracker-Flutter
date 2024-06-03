@@ -36,8 +36,10 @@ class _CustomCalendarState extends State<CustomCalendar> {
         _focusedDay = focusedDay;
       },
       onDayLongPressed: (selectedDay, focusedDay) {
-        widget.habit.completeForgottenHabit(selectedDay);
-        setState(() {});
+        if (!isSameDay(selectedDay, DateTime.now())) {
+          widget.habit.completeForgottenHabit(selectedDay);
+          setState(() {});
+        }
       },
       calendarStyle: CalendarStyle(
         defaultDecoration: BoxDecoration(
@@ -121,7 +123,7 @@ class _CustomCalendarState extends State<CustomCalendar> {
               child: Center(
                 child: Text(
                   '${date.day}',
-                  style: const TextStyle(color: Colors.white),
+                  style: const TextStyle(color: Colors.black),
                 ),
               ),
             );
@@ -136,14 +138,15 @@ class _CustomCalendarState extends State<CustomCalendar> {
           if (isCompleted) {
             return Container(
               margin: const EdgeInsets.all(6.0),
-              decoration: const BoxDecoration(
+              decoration: BoxDecoration(
                 color: Colors.orange,
                 shape: BoxShape.circle,
+                border: Border.all(color: Colors.white),
               ),
               child: Center(
                 child: Text(
                   '${date.day}',
-                  style: const TextStyle(color: Colors.white),
+                  style: const TextStyle(color: Colors.black),
                 ),
               ),
             );

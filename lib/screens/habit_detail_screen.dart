@@ -60,7 +60,15 @@ class _HabitDetailScreenState extends State<HabitDetailScreen> {
             right: 16,
             child: ElevatedButton(
               onPressed: _completeHabit,
-              child: const Text('Done today'),
+              style: ButtonStyle(
+                backgroundColor: WidgetStateProperty.resolveWith<Color>((states) {
+                  return widget.habit.isDateCompleted(DateTime.now()) ? Colors.white.withOpacity(0.1) : Colors.orange;
+                }),
+                foregroundColor: WidgetStateProperty.resolveWith<Color>((states) {
+                  return widget.habit.isDateCompleted(DateTime.now()) ? Colors.white : Colors.black;
+                }),
+              ),
+              child: Text(widget.habit.isDateCompleted(DateTime.now()) ? 'Already done' : 'Complete for today'),
             ),
           ),
         ],
