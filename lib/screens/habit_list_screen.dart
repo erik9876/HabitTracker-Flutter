@@ -46,13 +46,15 @@ class _HabitListScreenState extends State<HabitListScreen> {
 
   void _saveHabit() async {
     if (_habitNameController.text.isNotEmpty) {
-      Habit newHabit = Habit(name: _habitNameController.text);
+      Habit newHabit =
+          Habit(name: _habitNameController.text, position: habits.length);
       await newHabit.saveHabit();
       setState(() {
         habits.add(newHabit);
         isAddingNewHabit = false;
         _habitNameController.clear();
       });
+      HabitManager.saveHabitOrder(habits);
     }
   }
 
@@ -68,6 +70,7 @@ class _HabitListScreenState extends State<HabitListScreen> {
     setState(() {
       habits.remove(habit);
     });
+    HabitManager.saveHabitOrder(habits);
   }
 
   void _reorderHabits(int oldIndex, int newIndex) {
@@ -77,6 +80,11 @@ class _HabitListScreenState extends State<HabitListScreen> {
       }
       final Habit habit = habits.removeAt(oldIndex);
       habits.insert(newIndex, habit);
+
+      for (int i = 0; i < habits.length; i++) {
+        habits[i].position = i;
+      }
+
       HabitManager.saveHabitOrder(habits);
     });
   }
@@ -122,7 +130,7 @@ class _HabitListScreenState extends State<HabitListScreen> {
           children: [
             if (isAddingNewHabit)
               HabitInputCard(
-                key: ValueKey('input_card'),
+                key: const ValueKey('input_card'),
                 habitNameController: _habitNameController,
                 onSave: _saveHabit,
                 onCancel: _cancelAddHabit,

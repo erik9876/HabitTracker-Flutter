@@ -14,9 +14,9 @@ Future<void> initializeSampleHabits() async {
   List<Habit> existingHabits = await HabitManager.loadHabits();
   if (existingHabits.isEmpty) {
     List<Habit> sampleHabits = [
-      Habit(name: 'Exercise'),
-      Habit(name: 'Meditate'),
-      Habit(name: 'Read a book'),
+      Habit(name: 'Exercise', position: 1),
+      Habit(name: 'Meditate', position: 2),
+      Habit(name: 'Read a book', position: 3),
     ];
 
     for (Habit habit in sampleHabits) {

@@ -6,7 +6,12 @@ class HabitManager {
   static Future<List<Habit>> loadHabits() async {
     SharedPreferences prefs = await SharedPreferences.getInstance();
     List<String> habits = prefs.getStringList('habits') ?? [];
-    return habits.map((habit) => Habit.fromJson(jsonDecode(habit))).toList();
+    List<Habit> habitList =
+        habits.map((habit) => Habit.fromJson(jsonDecode(habit))).toList();
+
+    habitList.sort((a, b) => a.position.compareTo(b.position));
+
+    return habitList;
   }
 
   static Future<void> saveHabitOrder(List<Habit> habits) async {

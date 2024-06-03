@@ -10,8 +10,13 @@ class Habit {
   String name;
   List<DateTime> completedDates;
   Color color;
+  int position;
 
-  Habit({required this.name, List<DateTime>? completedDates, String? id})
+  Habit(
+      {required this.name,
+      List<DateTime>? completedDates,
+      String? id,
+      required this.position})
       : id = id ?? const Uuid().v4(),
         completedDates = completedDates ?? [],
         color = getRandomColor();
@@ -38,8 +43,6 @@ class Habit {
   }
 
   void completeHabit() {
-    // Add the current date to the completedDates list
-
     DateTime today = truncateDate(DateTime.now());
 
     if (!completedDates.contains(today)) {
@@ -57,7 +60,6 @@ class Habit {
   }
 
   void togglePastDate(DateTime date) {
-    // Toggle the completion of the given date
     if (date.isAfter(DateTime.now())) {
       log('You can only toggle past dates');
       return;
@@ -73,14 +75,11 @@ class Habit {
   }
 
   Future<void> saveHabit() async {
-    // Save the habit to the local storage
     SharedPreferences prefs = await SharedPreferences.getInstance();
     List<String> habits = prefs.getStringList('habits') ?? [];
 
-    // Remove the existing habit if present
     habits.removeWhere((habit) => Habit.fromJson(jsonDecode(habit)).id == id);
 
-    // Add the updated habit
     habits.add(jsonEncode(toJson()));
 
     await prefs.setStringList('habits', habits);
@@ -98,7 +97,6 @@ class Habit {
   }
 
   static DateTime truncateDate(DateTime date) {
-    // Truncate the date to the day
     return DateTime(date.year, date.month, date.day);
   }
 
@@ -108,6 +106,7 @@ class Habit {
       'name': name,
       'completedDates':
           completedDates.map((date) => date.toIso8601String()).toList(),
+      'position': position,
     };
   }
 
@@ -118,6 +117,7 @@ class Habit {
           .map((date) => truncateDate(DateTime.parse(date)))
           .toList(),
       id: json['id'],
+      position: json['position'],
     );
   }
 }
