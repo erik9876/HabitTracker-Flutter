@@ -117,55 +117,94 @@ class _HabitListScreenState extends State<HabitListScreen> {
         }
       },
       child: Scaffold(
-        appBar: AppBar(
-          title: const Text('Habit List'),
-          titleTextStyle: const TextStyle(
-            fontFamily: 'Montserrat',
-            fontWeight: FontWeight.w700,
-            fontSize: 24,
-          ),
-        ),
-        body: ReorderableListView(
-          onReorder: _reorderHabits,
-          children: [
-            if (isAddingNewHabit)
-              HabitInputCard(
-                key: const ValueKey('input_card'),
-                habitNameController: _habitNameController,
-                onSave: _saveHabit,
-                onCancel: _cancelAddHabit,
-              ),
-            for (int index = 0; index < habits.length; index++)
-              Dismissible(
-                key: ValueKey(habits[index].id),
-                direction: DismissDirection.endToStart,
-                onDismissed: (direction) {
-                  _deleteHabit(habits[index]);
+        body: CustomScrollView(
+          slivers: [
+            SliverAppBar(
+              surfaceTintColor: Theme.of(context).canvasColor,
+              expandedHeight: 50.0,
+              collapsedHeight: 15,
+              toolbarHeight: 15,
+              pinned: true,
+              flexibleSpace: LayoutBuilder(
+                builder: (BuildContext context, BoxConstraints constraints) {
+                  var top = constraints.biggest.height;
+                  return FlexibleSpaceBar(
+                    centerTitle: top <= 80,
+                    title: AnimatedOpacity(
+                      duration: const Duration(milliseconds: 300),
+                      opacity: top <= 80 ? 1.0 : 0.0,
+                      child: Transform.translate(
+                        offset: const Offset(0, 10),
+                        child: const Text(
+                          'Habit List',
+                          style: TextStyle(fontSize: 15),
+                        ),
+                      ),
+                    ),
+                    background: const Align(
+                      alignment: Alignment.bottomLeft,
+                      child: Padding(
+                        padding: EdgeInsets.only(left: 13, bottom: 8),
+                        child: Text(
+                          'Habit List',
+                          style: TextStyle(
+                            fontSize: 28,
+                            fontWeight: FontWeight.bold,
+                            color: Colors.white,
+                          ),
+                        ),
+                      ),
+                    ),
+                  );
                 },
-                background: Container(
-                  color: Colors.red,
-                  alignment: Alignment.centerRight,
-                  padding: const EdgeInsets.symmetric(horizontal: 20),
-                  child: const Icon(
-                    Icons.delete,
-                    color: Colors.white,
-                  ),
-                ),
-                child: GestureDetector(
-                  onTap: () async {
-                    if (!isAddingNewHabit) {
-                      var result = await Navigator.of(context)
-                          .push(_openListScreen(index));
-                      if (result == 'reload') {
-                        loadHabits();
-                      }
-                    } else {
-                      _cancelAddHabit();
-                    }
-                  },
-                  child: HabitCard(habit: habits[index]),
-                ),
               ),
+            ),
+            SliverList(
+              delegate: SliverChildBuilderDelegate(
+                (context, index) {
+                  if (isAddingNewHabit && index == habits.length) {
+                    return HabitInputCard(
+                      key: const ValueKey('input_card'),
+                      habitNameController: _habitNameController,
+                      onSave: _saveHabit,
+                      onCancel: _cancelAddHabit,
+                    );
+                  }
+                  final habitIndex = isAddingNewHabit ? index - 1 : index;
+                  return Dismissible(
+                    key: ValueKey(habits[habitIndex].id),
+                    direction: DismissDirection.endToStart,
+                    onDismissed: (direction) {
+                      _deleteHabit(habits[habitIndex]);
+                    },
+                    background: Container(
+                      color: Colors.red,
+                      alignment: Alignment.centerRight,
+                      padding: const EdgeInsets.symmetric(horizontal: 20),
+                      child: const Icon(
+                        Icons.delete,
+                        color: Colors.white,
+                      ),
+                    ),
+                    child: GestureDetector(
+                      onTap: () async {
+                        if (!isAddingNewHabit) {
+                          var result = await Navigator.of(context)
+                              .push(_openListScreen(habitIndex));
+                          if (result == 'reload') {
+                            loadHabits();
+                          }
+                        } else {
+                          _cancelAddHabit();
+                        }
+                      },
+                      child: HabitCard(habit: habits[habitIndex]),
+                    ),
+                  );
+                },
+                childCount: habits.length + (isAddingNewHabit ? 1 : 0),
+              ),
+            ),
           ],
         ),
         floatingActionButton: FloatingActionButton(
