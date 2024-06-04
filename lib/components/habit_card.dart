@@ -10,12 +10,26 @@ class HabitCard extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Card(
-      margin: const EdgeInsets.all(10.0),
-      child: Padding(
-        padding: const EdgeInsets.all(8.0),
-        child: ListTile(
-          title: Text(habit.name),
-          trailing: HabitStreak(habit: habit)
+      margin: const EdgeInsets.symmetric(vertical: 6, horizontal: 10),
+      child: Container(
+        height: 70,
+        alignment: Alignment.center,
+        child: Padding(
+          padding: const EdgeInsets.all(5.0),
+          child: ListTile(
+            title: Text(habit.name),
+            trailing: SizedBox(
+              width: 100,
+              child: Row(
+                mainAxisAlignment: MainAxisAlignment.end,
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  HabitStreak(habit: habit),
+                  const Icon(Icons.chevron_right),
+                ],
+              ),
+            ),
+          ),
         ),
       ),
     );
