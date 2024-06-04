@@ -3,7 +3,7 @@ import 'dart:convert';
 import 'dart:math' as math;
 import 'package:uuid/uuid.dart';
 import 'package:flutter/material.dart';
-import 'package:shared_preferences/shared_preferences.dart';
+import 'package:habit_tracker/data/repositories/habit_manager.dart';
 
 class Habit {
   final String id;
@@ -16,10 +16,13 @@ class Habit {
       {required this.name,
       List<DateTime>? completedDates,
       String? id,
-      required this.position})
+      required this.position,
+      Color? color})
       : id = id ?? const Uuid().v4(),
         completedDates = completedDates ?? [],
-        color = getRandomColor();
+        color = color ?? getRandomColor() {
+    HabitManager().insertHabit(this);
+  }
 
   static Color getRandomColor() {
     final random = math.Random();
@@ -48,7 +51,7 @@ class Habit {
     if (!completedDates.contains(today)) {
       completedDates.add(today);
       completedDates.sort();
-      saveHabit();
+      save();
     } else {
       log('Habit already completed today');
     }
@@ -71,53 +74,41 @@ class Habit {
       completedDates.add(date);
       completedDates.sort();
     }
-    saveHabit();
+    save();
   }
 
-  Future<void> saveHabit() async {
-    SharedPreferences prefs = await SharedPreferences.getInstance();
-    List<String> habits = prefs.getStringList('habits') ?? [];
-
-    habits.removeWhere((habit) => Habit.fromJson(jsonDecode(habit)).id == id);
-
-    habits.add(jsonEncode(toJson()));
-
-    await prefs.setStringList('habits', habits);
-    log('Habit saved: $name');
+  void save() {
+    HabitManager().updateHabit(this);
   }
 
-  Future<void> deleteHabit() async {
-    SharedPreferences prefs = await SharedPreferences.getInstance();
-    List<String> habits = prefs.getStringList('habits') ?? [];
-
-    habits.removeWhere((habit) => Habit.fromJson(jsonDecode(habit)).id == id);
-
-    await prefs.setStringList('habits', habits);
-    log('Habit deleted: $name');
+  void delete() {
+    HabitManager().deleteHabit(id);
   }
 
   static DateTime truncateDate(DateTime date) {
     return DateTime(date.year, date.month, date.day);
   }
 
-  Map<String, dynamic> toJson() {
+  Map<String, dynamic> toMap() {
     return {
       'id': id,
       'name': name,
-      'completedDates':
-          completedDates.map((date) => date.toIso8601String()).toList(),
+      'completed_dates': jsonEncode(
+          completedDates.map((date) => date.toIso8601String()).toList()),
       'position': position,
+      'color': color.value,
     };
   }
 
-  static Habit fromJson(Map<String, dynamic> json) {
+  static Habit fromMap(Map<String, dynamic> map) {
     return Habit(
-      name: json['name'],
-      completedDates: (json['completedDates'] as List<dynamic>)
-          .map((date) => truncateDate(DateTime.parse(date)))
+      name: map['name'],
+      completedDates: (jsonDecode(map['completed_dates']) as List<dynamic>)
+          .map((date) => DateTime.parse(date))
           .toList(),
-      id: json['id'],
-      position: json['position'],
+      id: map['id'],
+      position: map['position'],
+      color: Color(map['color']),
     );
   }
 }

@@ -31,7 +31,7 @@ class _HabitListScreenState extends State<HabitListScreen> {
   }
 
   Future<void> loadHabits() async {
-    List<Habit> loadedHabits = await HabitManager.loadHabits();
+    List<Habit> loadedHabits = await HabitManager().getHabits();
     setState(() {
       habits = loadedHabits;
     });
@@ -48,13 +48,12 @@ class _HabitListScreenState extends State<HabitListScreen> {
     if (_habitNameController.text.isNotEmpty) {
       Habit newHabit =
           Habit(name: _habitNameController.text, position: habits.length);
-      await newHabit.saveHabit();
+      newHabit.save();
       setState(() {
         habits.add(newHabit);
         isAddingNewHabit = false;
         _habitNameController.clear();
       });
-      HabitManager.saveHabitOrder(habits);
     }
   }
 
@@ -66,11 +65,10 @@ class _HabitListScreenState extends State<HabitListScreen> {
   }
 
   void _deleteHabit(Habit habit) async {
-    await habit.deleteHabit();
+    habit.delete();
     setState(() {
       habits.remove(habit);
     });
-    HabitManager.saveHabitOrder(habits);
   }
 
   void _reorderHabits(int oldIndex, int newIndex) {
@@ -83,9 +81,8 @@ class _HabitListScreenState extends State<HabitListScreen> {
 
       for (int i = 0; i < habits.length; i++) {
         habits[i].position = i;
+        habits[i].save();
       }
-
-      HabitManager.saveHabitOrder(habits);
     });
   }
 
@@ -120,7 +117,7 @@ class _HabitListScreenState extends State<HabitListScreen> {
         body: CustomScrollView(
           slivers: [
             SliverAppBar(
-              surfaceTintColor: Theme.of(context).canvasColor,
+              surfaceTintColor: Theme.of(context).canvasColor, // bisschen dumm
               expandedHeight: 50.0,
               collapsedHeight: 15,
               toolbarHeight: 15,
@@ -159,50 +156,51 @@ class _HabitListScreenState extends State<HabitListScreen> {
                 },
               ),
             ),
-            SliverList(
-              delegate: SliverChildBuilderDelegate(
-                (context, index) {
-                  if (isAddingNewHabit && index == habits.length) {
-                    return HabitInputCard(
+            SliverToBoxAdapter(
+              child: ReorderableListView(
+                onReorder: _reorderHabits,
+                shrinkWrap: true,
+                physics: const NeverScrollableScrollPhysics(),
+                children: [
+                  for (int index = 0; index < habits.length; index++)
+                    Dismissible(
+                      key: ValueKey(habits[index].id),
+                      direction: DismissDirection.endToStart,
+                      onDismissed: (direction) {
+                        _deleteHabit(habits[index]);
+                      },
+                      background: Container(
+                        color: Colors.red,
+                        alignment: Alignment.centerRight,
+                        padding: const EdgeInsets.symmetric(horizontal: 20),
+                        child: const Icon(
+                          Icons.delete,
+                          color: Colors.white,
+                        ),
+                      ),
+                      child: GestureDetector(
+                        onTap: () async {
+                          if (!isAddingNewHabit) {
+                            var result = await Navigator.of(context)
+                                .push(_openListScreen(index));
+                            if (result == 'reload') {
+                              loadHabits();
+                            }
+                          } else {
+                            _cancelAddHabit();
+                          }
+                        },
+                        child: HabitCard(habit: habits[index]),
+                      ),
+                    ),
+                  if (isAddingNewHabit)
+                    HabitInputCard(
                       key: const ValueKey('input_card'),
                       habitNameController: _habitNameController,
                       onSave: _saveHabit,
                       onCancel: _cancelAddHabit,
-                    );
-                  }
-                  final habitIndex = isAddingNewHabit ? index - 1 : index;
-                  return Dismissible(
-                    key: ValueKey(habits[habitIndex].id),
-                    direction: DismissDirection.endToStart,
-                    onDismissed: (direction) {
-                      _deleteHabit(habits[habitIndex]);
-                    },
-                    background: Container(
-                      color: Colors.red,
-                      alignment: Alignment.centerRight,
-                      padding: const EdgeInsets.symmetric(horizontal: 20),
-                      child: const Icon(
-                        Icons.delete,
-                        color: Colors.white,
-                      ),
                     ),
-                    child: GestureDetector(
-                      onTap: () async {
-                        if (!isAddingNewHabit) {
-                          var result = await Navigator.of(context)
-                              .push(_openListScreen(habitIndex));
-                          if (result == 'reload') {
-                            loadHabits();
-                          }
-                        } else {
-                          _cancelAddHabit();
-                        }
-                      },
-                      child: HabitCard(habit: habits[habitIndex]),
-                    ),
-                  );
-                },
-                childCount: habits.length + (isAddingNewHabit ? 1 : 0),
+                ],
               ),
             ),
           ],

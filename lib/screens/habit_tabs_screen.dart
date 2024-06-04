@@ -25,7 +25,7 @@ class _HabitTabsScreenState extends State<HabitTabsScreen>
   }
 
   Future<void> _loadHabits() async {
-    List<Habit> habits = await HabitManager.loadHabits();
+    List<Habit> habits = await HabitManager().getHabits();
     setState(() {
       _habits = habits;
       _updateTabController();

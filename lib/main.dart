@@ -11,7 +11,7 @@ void main() async {
 }
 
 Future<void> initializeSampleHabits() async {
-  List<Habit> existingHabits = await HabitManager.loadHabits();
+  List<Habit> existingHabits = await HabitManager().getHabits();
   if (existingHabits.isEmpty) {
     List<Habit> sampleHabits = [
       Habit(name: 'Exercise', position: 1),
@@ -20,7 +20,7 @@ Future<void> initializeSampleHabits() async {
     ];
 
     for (Habit habit in sampleHabits) {
-      await habit.saveHabit();
+      habit.save();
     }
     log('Sample habits initialized.');
   } else {
