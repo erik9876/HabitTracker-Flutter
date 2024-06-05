@@ -1,6 +1,7 @@
 import 'dart:developer';
 import 'dart:convert';
 import 'dart:math' as math;
+import 'package:habit_tracker/main.dart';
 import 'package:uuid/uuid.dart';
 import 'package:flutter/material.dart';
 import 'package:habit_tracker/data/repositories/habit_manager.dart';
@@ -12,6 +13,8 @@ class Habit {
   Color color;
   int position;
 
+  final IHabitManager _manager = getIt<IHabitManager>();
+
   Habit(
       {required this.name,
       List<DateTime>? completedDates,
@@ -21,7 +24,7 @@ class Habit {
       : id = id ?? const Uuid().v4(),
         completedDates = completedDates ?? [],
         color = color ?? getRandomColor() {
-    HabitManager().insertHabit(this);
+    _manager.create(this);
   }
 
   static Color getRandomColor() {
@@ -88,11 +91,11 @@ class Habit {
   }
 
   Future<void> save() async {
-    await HabitManager().updateHabit(this);
+    await _manager.update(this);
   }
 
   Future<void> delete() async {
-    await HabitManager().deleteHabit(id);
+    await _manager.delete(this);
   }
 
   static DateTime truncateDate(DateTime date) {
