@@ -77,12 +77,12 @@ class Habit {
     save();
   }
 
-  void save() {
-    HabitManager().updateHabit(this);
+  Future<void> save() async {
+    await HabitManager().updateHabit(this);
   }
 
-  void delete() {
-    HabitManager().deleteHabit(id);
+  Future<void> delete() async {
+    await HabitManager().deleteHabit(id);
   }
 
   static DateTime truncateDate(DateTime date) {

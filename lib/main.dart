@@ -20,7 +20,7 @@ Future<void> initializeSampleHabits() async {
     ];
 
     for (Habit habit in sampleHabits) {
-      habit.save();
+      await habit.save();
     }
     log('Sample habits initialized.');
   } else {
