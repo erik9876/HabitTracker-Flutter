@@ -1,11 +1,17 @@
 import 'package:flutter/material.dart';
+import 'package:get_it/get_it.dart';
 import 'package:habit_tracker/data/models/habit.dart';
 import 'package:habit_tracker/data/repositories/habit_manager.dart';
 import 'package:habit_tracker/screens/habit_list_screen.dart';
 import 'dart:developer';
 
+final getIt = GetIt.instance;
+
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
+
+  getIt.registerSingleton<IHabitManager>(HabitManager());
+
   await initializeSampleHabits();
   runApp(const MyApp());
 }

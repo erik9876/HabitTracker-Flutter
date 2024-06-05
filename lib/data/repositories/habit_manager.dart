@@ -1,8 +1,16 @@
 import 'package:sqflite/sqflite.dart';
 import 'package:path/path.dart';
 import 'package:habit_tracker/data/models/habit.dart';
+import 'dart:developer';
 
-class HabitManager {
+abstract class IHabitManager {
+  Future<bool> create(Habit habit);
+  Future<bool> update(Habit habit);
+  Future<bool> delete(Habit habit);
+  Future<List<Habit>> getAll();
+}
+
+class HabitManager implements IHabitManager {
   static final HabitManager _instance = HabitManager._internal();
   static Database? _db;
 
@@ -26,11 +34,12 @@ class HabitManager {
 
   Future<Database> _initDb() async {
     String path = join(await getDatabasesPath(), 'habits.db');
-    final habitsDb = await openDatabase(path, version: 1, onCreate: _createDb);
+    final habitsDb =
+        await openDatabase(path, version: 1, onCreate: _initializeDb);
     return habitsDb;
   }
 
-  void _createDb(Database db, int version) async {
+  void _initializeDb(Database db, int version) async {
     await db.execute('''
       CREATE TABLE $habitsTable(
         $colId TEXT PRIMARY KEY,
@@ -42,7 +51,7 @@ class HabitManager {
     ''');
   }
 
-  Future<int> insertHabit(Habit habit) async {
+  Future<int> createHabit(Habit habit) async {
     Database? db = await this.db;
 
     var existingHabit = await db!.query(
@@ -88,5 +97,43 @@ class HabitManager {
         habitsMapList.map((habitMap) => Habit.fromMap(habitMap)).toList();
     habitsList.sort((a, b) => a.position.compareTo(b.position));
     return habitsList;
+  }
+
+  @override
+  Future<bool> create(Habit habit) async {
+    try {
+      // successful if returns valid id
+      return 0 < await createHabit(habit);
+    } catch (ex) {
+      log('$ex');
+      return false;
+    }
+  }
+
+  @override
+  Future<bool> update(Habit habit) async {
+    try {
+      // successful if returns valid id
+      return 0 < await updateHabit(habit);
+    } catch (ex) {
+      log('$ex');
+      return false;
+    }
+  }
+
+  @override
+  Future<bool> delete(Habit habit) async {
+    try {
+      // successful if returns valid id
+      return 0 < await deleteHabit(habit.id);
+    } catch (ex) {
+      log('$ex');
+      return false;
+    }
+  }
+
+  @override
+  Future<List<Habit>> getAll() {
+    return getHabits();
   }
 }
