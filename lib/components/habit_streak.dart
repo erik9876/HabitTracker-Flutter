@@ -12,9 +12,18 @@ class HabitStreak extends StatelessWidget {
     return Row(
       mainAxisSize: MainAxisSize.min,
       children: [
-        Text(habit.getStreakDays().toString(), style: const TextStyle(fontSize: 16)),
-        const SizedBox(width: 6),
-        const Icon(CupertinoIcons.flame, size: 22, color: Colors.orange),
+        Text(
+          habit.getStreakDays().toString(),
+          style: const TextStyle(
+            fontSize: 18,
+          ),
+        ),
+        const SizedBox(width: 4),
+        Icon(CupertinoIcons.flame,
+            size: 22,
+            color: habit.isDateCompleted(DateTime.now())
+                ? Colors.orange
+                : Colors.grey),
       ],
     );
   }

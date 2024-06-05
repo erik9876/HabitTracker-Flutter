@@ -1,7 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:habit_tracker/components/habit_streak.dart';
 import 'package:habit_tracker/data/models/habit.dart';
-import 'package:habit_tracker/components/custom_calendar.dart'; // Importieren Sie die CustomCalendar
+import 'package:habit_tracker/components/custom_calendar.dart';
+import 'package:habit_tracker/components/total_days.dart';
 
 class HabitDetailScreen extends StatefulWidget {
   final Habit habit;
@@ -13,6 +14,14 @@ class HabitDetailScreen extends StatefulWidget {
 }
 
 class _HabitDetailScreenState extends State<HabitDetailScreen> {
+  late DateTime _currentMonth;
+
+  @override
+  void initState() {
+    super.initState();
+    _currentMonth = DateTime.now();
+  }
+
   void _completeHabit() {
     setState(() {
       widget.habit.completeHabit();
@@ -23,40 +32,50 @@ class _HabitDetailScreenState extends State<HabitDetailScreen> {
     setState(() {});
   }
 
+  void _onMonthSwitchedCallback(DateTime newMonth) {
+    setState(() {
+      _currentMonth = newMonth;
+    });
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
         automaticallyImplyLeading: false,
-        title: Text(widget.habit.name),
+        title: Padding(
+          padding: const EdgeInsets.symmetric(horizontal: 6),
+          child: Row(
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            children: [
+              Text(
+                widget.habit.name,
+                style: const TextStyle(
+                  fontSize: 28,
+                  fontWeight: FontWeight.bold,
+                ),
+              ),
+              HabitStreak(habit: widget.habit),
+            ],
+          ),
+        ),
+        centerTitle: false,
       ),
       body: Stack(
         children: [
           Padding(
-            padding: const EdgeInsets.all(16.0),
+            padding: const EdgeInsets.symmetric(horizontal: 16.0),
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                Row(
-                  mainAxisSize: MainAxisSize.min,
-                  children: [
-                    const Text('Current Streak:',
-                        style: TextStyle(fontSize: 18)),
-                    const SizedBox(width: 10),
-                    HabitStreak(habit: widget.habit)
-                  ],
+                TotalDays(
+                  habit: widget.habit,
+                  date: _currentMonth,
                 ),
-                const SizedBox(height: 10),
-                const Text('Completed Dates:', style: TextStyle(fontSize: 18)),
-                const SizedBox(height: 10),
-                Card(
-                  child: Padding(
-                    padding: const EdgeInsets.all(10),
-                    child: CustomCalendar(
-                      habit: widget.habit,
-                      onDayLongPressed: _onDayLongPressedCallback,
-                    ),
-                  ),
+                CustomCalendar(
+                  habit: widget.habit,
+                  onDayLongPressed: _onDayLongPressedCallback,
+                  onMonthSwitched: _onMonthSwitchedCallback,
                 ),
               ],
             ),

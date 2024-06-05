@@ -57,6 +57,16 @@ class Habit {
     }
   }
 
+  int getTotalCompletedDatesInMonth(DateTime date) {
+    DateTime firstDayOfMonth = DateTime(date.year, date.month, 0);
+    DateTime lastDayOfMonth = DateTime(date.year, date.month + 1, 1);
+    return completedDates
+        .where((completedDate) =>
+            completedDate.isAfter(firstDayOfMonth) &&
+            completedDate.isBefore(lastDayOfMonth))
+        .length;
+  }
+
   bool isDateCompleted(DateTime date) {
     var truncatedDate = truncateDate(date);
     return completedDates.contains(truncatedDate);
