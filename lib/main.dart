@@ -1,7 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:get_it/get_it.dart';
 import 'package:habit_tracker/data/models/habit.dart';
-import 'package:habit_tracker/data/repositories/habit_manager.dart';
+import 'package:habit_tracker/data/repositories/habit_repository.dart';
+import 'package:habit_tracker/data/services/habit_manager.dart';
 import 'package:habit_tracker/screens/habit_list_screen.dart';
 import 'dart:developer';
 
@@ -10,14 +11,18 @@ final getIt = GetIt.instance;
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
 
+  var habitRepository = SqfLiteHabitRepository();
+  await habitRepository.initDb();
+
+  getIt.registerSingleton<IHabitRepository>(habitRepository);
   getIt.registerSingleton<IHabitManager>(HabitManager());
 
-  await initializeSampleHabits();
+  await initializeSampleHabits(habitRepository);
   runApp(const MyApp());
 }
 
-Future<void> initializeSampleHabits() async {
-  List<Habit> existingHabits = await HabitManager().getHabits();
+Future<void> initializeSampleHabits(IHabitRepository repository) async {
+  List<Habit> existingHabits = await repository.getAll();
   if (existingHabits.isEmpty) {
     List<Habit> sampleHabits = [
       Habit(name: 'Exercise', position: 1),
@@ -26,8 +31,9 @@ Future<void> initializeSampleHabits() async {
     ];
 
     for (Habit habit in sampleHabits) {
-      await habit.save();
+      await repository.create(habit);
     }
+
     log('Sample habits initialized.');
   } else {
     log('Habits already exist.');

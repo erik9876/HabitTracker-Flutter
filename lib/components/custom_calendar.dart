@@ -1,4 +1,6 @@
 import 'package:flutter/material.dart';
+import 'package:habit_tracker/data/services/habit_manager.dart';
+import 'package:habit_tracker/main.dart';
 import 'package:table_calendar/table_calendar.dart';
 import 'package:habit_tracker/data/models/habit.dart';
 import 'package:intl/intl.dart';
@@ -21,6 +23,8 @@ class CustomCalendar extends StatefulWidget {
 class _CustomCalendarState extends State<CustomCalendar> {
   CalendarFormat _calendarFormat = CalendarFormat.month;
   DateTime _focusedDay = DateTime.now();
+
+  final IHabitManager _habitManager = getIt<IHabitManager>();
 
   @override
   Widget build(BuildContext context) {
@@ -47,7 +51,7 @@ class _CustomCalendarState extends State<CustomCalendar> {
           },
           onDayLongPressed: (selectedDay, focusedDay) {
             if (!isSameDay(selectedDay, DateTime.now())) {
-              widget.habit.togglePastDate(selectedDay);
+              _habitManager.togglePastDate(widget.habit, selectedDay);
               widget.onDayLongPressed();
             }
           },

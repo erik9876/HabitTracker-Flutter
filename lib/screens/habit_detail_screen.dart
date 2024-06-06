@@ -3,6 +3,8 @@ import 'package:habit_tracker/components/habit_streak.dart';
 import 'package:habit_tracker/data/models/habit.dart';
 import 'package:habit_tracker/components/custom_calendar.dart';
 import 'package:habit_tracker/components/total_days.dart';
+import 'package:habit_tracker/data/services/habit_manager.dart';
+import 'package:habit_tracker/main.dart';
 
 class HabitDetailScreen extends StatefulWidget {
   final Habit habit;
@@ -16,15 +18,19 @@ class HabitDetailScreen extends StatefulWidget {
 class _HabitDetailScreenState extends State<HabitDetailScreen> {
   late DateTime _currentMonth;
 
+  final IHabitManager _habitManager = getIt<IHabitManager>();
+
   @override
   void initState() {
     super.initState();
     _currentMonth = DateTime.now();
   }
 
-  void _completeHabit() {
+  void _completeHabit() async {
+    await _habitManager.completeHabit(widget.habit);
+
     setState(() {
-      widget.habit.completeHabit();
+      widget.habit;
     });
   }
 
