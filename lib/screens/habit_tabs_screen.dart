@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:habit_tracker/data/models/habit.dart';
 import 'package:habit_tracker/data/services/habit_manager.dart';
+import 'package:habit_tracker/main.dart';
 import 'package:habit_tracker/screens/habit_detail_screen.dart';
 import 'package:habit_tracker/screens/habit_list_screen.dart';
 
@@ -18,6 +19,8 @@ class _HabitTabsScreenState extends State<HabitTabsScreen>
   TabController? _tabController;
   List<Habit> _habits = [];
 
+  final IHabitManager _habitManager = getIt<IHabitManager>();
+
   @override
   void initState() {
     super.initState();
@@ -25,7 +28,9 @@ class _HabitTabsScreenState extends State<HabitTabsScreen>
   }
 
   Future<void> _loadHabits() async {
-    List<Habit> habits = await HabitManager().getHabits();
+    List<Habit> habits = await _habitManager.getHabits();
+    habits.sort((h1, h2) => h1.position.compareTo(h2.position));
+
     setState(() {
       _habits = habits;
       _updateTabController();
