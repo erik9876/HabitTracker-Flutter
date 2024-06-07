@@ -13,7 +13,7 @@ class HabitStreak extends StatelessWidget {
       mainAxisSize: MainAxisSize.min,
       children: [
         Text(
-          habit.getStreakDays().toString(),
+          habit.streak.toString(),
           style: const TextStyle(
             fontSize: 18,
           ),

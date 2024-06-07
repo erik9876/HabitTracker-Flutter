@@ -2,7 +2,8 @@ import 'package:flutter/material.dart';
 import 'package:habit_tracker/components/habit_card.dart';
 import 'package:habit_tracker/components/habit_input_card.dart';
 import 'package:habit_tracker/data/models/habit.dart';
-import 'package:habit_tracker/data/repositories/habit_manager.dart';
+import 'package:habit_tracker/data/services/habit_manager.dart';
+import 'package:habit_tracker/main.dart';
 import 'package:habit_tracker/screens/habit_tabs_screen.dart';
 import 'dart:developer';
 
@@ -18,6 +19,8 @@ class _HabitListScreenState extends State<HabitListScreen> {
   bool isAddingNewHabit = false;
   final TextEditingController _habitNameController = TextEditingController();
 
+  final IHabitManager _habitManager = getIt<IHabitManager>();
+
   @override
   void initState() {
     super.initState();
@@ -31,7 +34,9 @@ class _HabitListScreenState extends State<HabitListScreen> {
   }
 
   Future<void> loadHabits() async {
-    List<Habit> loadedHabits = await HabitManager().getHabits();
+    List<Habit> loadedHabits = await _habitManager.getHabits();
+    loadedHabits.sort((h1, h2) => h1.position.compareTo(h2.position));
+
     setState(() {
       habits = loadedHabits;
     });
@@ -47,8 +52,7 @@ class _HabitListScreenState extends State<HabitListScreen> {
   void _saveHabit() async {
     if (_habitNameController.text.isNotEmpty) {
       Habit newHabit =
-          Habit(name: _habitNameController.text, position: habits.length);
-      newHabit.save();
+          await _habitManager.create(_habitNameController.text, habits.length);
       setState(() {
         habits.add(newHabit);
         isAddingNewHabit = false;
@@ -65,7 +69,7 @@ class _HabitListScreenState extends State<HabitListScreen> {
   }
 
   void _deleteHabit(Habit habit) async {
-    habit.delete();
+    await _habitManager.delete(habit);
     setState(() {
       habits.remove(habit);
     });
@@ -80,8 +84,7 @@ class _HabitListScreenState extends State<HabitListScreen> {
       habits.insert(newIndex, habit);
 
       for (int i = 0; i < habits.length; i++) {
-        habits[i].position = i;
-        habits[i].save();
+        _habitManager.updatePosition(habits[i], i);
       }
     });
   }

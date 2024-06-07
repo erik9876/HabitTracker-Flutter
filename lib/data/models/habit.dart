@@ -1,10 +1,8 @@
-import 'dart:developer';
 import 'dart:convert';
 import 'dart:math' as math;
-import 'package:habit_tracker/main.dart';
+import 'package:habit_tracker/data/helper/datetime_helper.dart';
 import 'package:uuid/uuid.dart';
 import 'package:flutter/material.dart';
-import 'package:habit_tracker/data/repositories/habit_manager.dart';
 
 class Habit {
   final String id;
@@ -13,7 +11,7 @@ class Habit {
   Color color;
   int position;
 
-  final IHabitManager _manager = getIt<IHabitManager>();
+  int streak = 0;
 
   Habit(
       {required this.name,
@@ -23,9 +21,7 @@ class Habit {
       Color? color})
       : id = id ?? const Uuid().v4(),
         completedDates = completedDates ?? [],
-        color = color ?? getRandomColor() {
-    _manager.create(this);
-  }
+        color = color ?? getRandomColor();
 
   static Color getRandomColor() {
     final random = math.Random();
@@ -37,7 +33,24 @@ class Habit {
     );
   }
 
-  int getStreakDays() {
+  void addDate(DateTime date) {
+    date = truncateDate(date);
+    if (!completedDates.contains(date)) {
+      completedDates.add(date);
+      completedDates.sort();
+      calculateStreak();
+    }
+  }
+
+  void removeDate(DateTime date) {
+    date = truncateDate(date);
+    if (completedDates.contains(date)) {
+      completedDates.remove(date);
+      calculateStreak();
+    }
+  }
+
+  void calculateStreak() {
     DateTime today = truncateDate(DateTime.now());
     int streakCount = completedDates.contains(today) ? 1 : 0;
     DateTime yesterday = truncateDate(today.subtract(const Duration(days: 1)));
@@ -45,19 +58,7 @@ class Habit {
       streakCount += 1;
       yesterday = truncateDate(yesterday.subtract(const Duration(days: 1)));
     }
-    return streakCount;
-  }
-
-  void completeHabit() {
-    DateTime today = truncateDate(DateTime.now());
-
-    if (!completedDates.contains(today)) {
-      completedDates.add(today);
-      completedDates.sort();
-      save();
-    } else {
-      log('Habit already completed today');
-    }
+    streak = streakCount;
   }
 
   int getTotalCompletedDatesInMonth(DateTime date) {
@@ -73,33 +74,6 @@ class Habit {
   bool isDateCompleted(DateTime date) {
     var truncatedDate = truncateDate(date);
     return completedDates.contains(truncatedDate);
-  }
-
-  void togglePastDate(DateTime date) {
-    if (date.isAfter(DateTime.now())) {
-      log('You can only toggle past dates');
-      return;
-    }
-    date = truncateDate(date);
-    if (completedDates.contains(date)) {
-      completedDates.remove(date);
-    } else {
-      completedDates.add(date);
-      completedDates.sort();
-    }
-    save();
-  }
-
-  Future<void> save() async {
-    await _manager.update(this);
-  }
-
-  Future<void> delete() async {
-    await _manager.delete(this);
-  }
-
-  static DateTime truncateDate(DateTime date) {
-    return DateTime(date.year, date.month, date.day);
   }
 
   Map<String, dynamic> toMap() {
