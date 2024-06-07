@@ -17,7 +17,17 @@ class HabitCard extends StatelessWidget {
         child: Padding(
           padding: const EdgeInsets.all(5.0),
           child: ListTile(
-            title: Text(habit.name),
+            title: Row(
+              children: [
+                Icon(
+                  Icons.circle,
+                  color: habit.color,
+                  size: 20,
+                ),
+                const SizedBox(width: 6),
+                Text(habit.name),
+              ],
+            ),
             trailing: SizedBox(
               width: 100,
               child: Row(

@@ -6,6 +6,9 @@ import 'package:habit_tracker/data/services/habit_manager.dart';
 import 'package:habit_tracker/main.dart';
 import 'package:habit_tracker/screens/habit_tabs_screen.dart';
 import 'dart:developer';
+import 'package:flutter_slidable/flutter_slidable.dart';
+import 'package:flutter/cupertino.dart';
+import 'package:habit_tracker/screens/habit_settings_screen.dart';
 
 class HabitListScreen extends StatefulWidget {
   const HabitListScreen({super.key});
@@ -36,10 +39,11 @@ class _HabitListScreenState extends State<HabitListScreen> {
   Future<void> loadHabits() async {
     List<Habit> loadedHabits = await _habitManager.getHabits();
     loadedHabits.sort((h1, h2) => h1.position.compareTo(h2.position));
-
-    setState(() {
-      habits = loadedHabits;
-    });
+    if (mounted) {
+      setState(() {
+        habits = loadedHabits;
+      });
+    }
   }
 
   void _addHabit() {
@@ -68,10 +72,21 @@ class _HabitListScreenState extends State<HabitListScreen> {
     });
   }
 
-  void _deleteHabit(Habit habit) async {
+  void _deleteHabit(Habit habit, BuildContext context) async {
     await _habitManager.delete(habit);
     setState(() {
       habits.remove(habit);
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text(
+            '${habit.name} dismissed',
+            style: const TextStyle(
+              color: Colors.white,
+            ),
+          ),
+          backgroundColor: Theme.of(context).dialogBackgroundColor,
+        ),
+      );
     });
   }
 
@@ -120,7 +135,7 @@ class _HabitListScreenState extends State<HabitListScreen> {
         body: CustomScrollView(
           slivers: [
             SliverAppBar(
-              surfaceTintColor: Theme.of(context).canvasColor, // bisschen dumm
+              surfaceTintColor: Theme.of(context).dialogBackgroundColor,
               expandedHeight: 50.0,
               collapsedHeight: 15,
               toolbarHeight: 15,
@@ -166,20 +181,45 @@ class _HabitListScreenState extends State<HabitListScreen> {
                 physics: const NeverScrollableScrollPhysics(),
                 children: [
                   for (int index = 0; index < habits.length; index++)
-                    Dismissible(
+                    Slidable(
                       key: ValueKey(habits[index].id),
-                      direction: DismissDirection.endToStart,
-                      onDismissed: (direction) {
-                        _deleteHabit(habits[index]);
-                      },
-                      background: Container(
-                        color: Colors.red,
-                        alignment: Alignment.centerRight,
-                        padding: const EdgeInsets.symmetric(horizontal: 20),
-                        child: const Icon(
-                          Icons.delete,
-                          color: Colors.white,
+                      endActionPane: ActionPane(
+                        motion: const DrawerMotion(),
+                        dismissible: DismissiblePane(
+                          onDismissed: () =>
+                              _deleteHabit(habits[index], context),
                         ),
+                        children: [
+                          SlidableAction(
+                            onPressed: (context) async {
+                              await Navigator.of(context).push(
+                                PageRouteBuilder(
+                                  pageBuilder: (context, animation,
+                                          secondaryAnimation) =>
+                                      HabitSettingsScreen(habit: habits[index]),
+                                ),
+                              );
+
+                              setState(() {});
+                            },
+                            backgroundColor: Colors.grey,
+                            foregroundColor: Colors.white,
+                            icon: CupertinoIcons.settings,
+                            borderRadius: BorderRadius.circular(12),
+                            padding: const EdgeInsets.symmetric(horizontal: 5),
+                            label: 'Settings',
+                          ),
+                          SlidableAction(
+                            onPressed: (context) =>
+                                _deleteHabit(habits[index], context),
+                            backgroundColor: Colors.red,
+                            foregroundColor: Colors.white,
+                            icon: CupertinoIcons.delete,
+                            borderRadius: BorderRadius.circular(12),
+                            padding: const EdgeInsets.symmetric(horizontal: 5),
+                            label: 'Delete',
+                          ),
+                        ],
                       ),
                       child: GestureDetector(
                         onTap: () async {

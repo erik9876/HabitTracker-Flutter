@@ -5,7 +5,6 @@ import 'package:habit_tracker/components/custom_calendar.dart';
 import 'package:habit_tracker/components/total_days.dart';
 import 'package:habit_tracker/data/services/habit_manager.dart';
 import 'package:habit_tracker/main.dart';
-import 'package:habit_tracker/screens/habit_settings_screen.dart';
 
 class HabitDetailScreen extends StatefulWidget {
   final Habit habit;
@@ -65,19 +64,6 @@ class _HabitDetailScreenState extends State<HabitDetailScreen> {
               Row(
                 children: [
                   HabitStreak(habit: widget.habit),
-                  IconButton(
-                      onPressed: () async {
-                        await Navigator.of(context).push(
-                          PageRouteBuilder(
-                            pageBuilder:
-                                (context, animation, secondaryAnimation) =>
-                                    HabitSettingsScreen(habit: widget.habit),
-                          ),
-                        );
-
-                        setState(() {});
-                      },
-                      icon: const Icon(Icons.settings)),
                 ],
               )
             ],
