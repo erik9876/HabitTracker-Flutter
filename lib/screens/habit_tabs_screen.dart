@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/cupertino.dart';
 import 'package:habit_tracker/data/models/habit.dart';
 import 'package:habit_tracker/data/services/habit_manager.dart';
 import 'package:habit_tracker/main.dart';
@@ -126,9 +127,9 @@ class _HabitTabsScreenState extends State<HabitTabsScreen>
                   child: GestureDetector(
                     onTap: _navigateToListScreen,
                     child: const Icon(
-                      Icons.list,
+                      CupertinoIcons.list_bullet,
                       color: Colors.white,
-                      size: 30,
+                      size: 25,
                     ),
                   ),
                 ),

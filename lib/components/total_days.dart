@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/cupertino.dart';
 import 'package:habit_tracker/data/models/habit.dart';
 
 class TotalDays extends StatelessWidget {
@@ -26,7 +27,7 @@ class TotalDays extends StatelessWidget {
                 children: [
                   const SizedBox(width: 10),
                   Icon(
-                    Icons.check_circle_outline,
+                    CupertinoIcons.check_mark_circled_solid,
                     color: habit.color,
                   ),
                   const SizedBox(width: 8),
