@@ -21,7 +21,9 @@ class Habit {
       Color? color})
       : id = id ?? const Uuid().v4(),
         completedDates = completedDates ?? [],
-        color = color ?? getRandomColor();
+        color = color ?? getRandomColor() {
+    calculateStreak();
+  }
 
   static Color getRandomColor() {
     final random = math.Random();
