@@ -8,6 +8,7 @@ abstract class IHabitManager {
   // Wrapper methods for potential validation
   Future<Habit> create(String name, int position);
   Future<void> delete(Habit habit);
+  Future<void> update(Habit habit);
   Future<List<Habit>> getHabits();
   Future<void> completeHabit(Habit habit);
   Future<void> togglePastDate(Habit habit, DateTime date);
@@ -27,6 +28,11 @@ class HabitManager implements IHabitManager {
   @override
   Future<void> delete(Habit habit) async {
     await _repository.delete(habit);
+  }
+
+  @override
+  Future<void> update(Habit habit) async {
+    await _repository.update(habit);
   }
 
   @override
