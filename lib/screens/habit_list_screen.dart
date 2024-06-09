@@ -20,7 +20,7 @@ class HabitListScreen extends StatefulWidget {
 class _HabitListScreenState extends State<HabitListScreen> {
   List<Habit> habits = [];
   bool isAddingNewHabit = false;
-  bool isClosed = true;
+  Set<int> openedSlidables = {};
   final TextEditingController _habitNameController = TextEditingController();
 
   final IHabitManager _habitManager = getIt<IHabitManager>();
@@ -253,17 +253,19 @@ class _HabitListScreenState extends State<HabitListScreen> {
                                     Slidable.of(contextFromLayoutBuilder);
                                 if (details.delta.dx > 0) {
                                   slidable?.close();
-                                  setState(() => isClosed = true);
+                                  setState(() => openedSlidables.remove(index));
                                 }
 
                                 if (details.delta.dx < 0) {
                                   slidable?.openEndActionPane();
-                                  setState(() => isClosed = false);
+                                  setState(() => openedSlidables.add(index));
                                 }
+
+                                log('Opened slidables: $openedSlidables');
                               },
                               child: HabitCard(
                                 habit: habits[index],
-                                borderRounded: isClosed,
+                                borderRounded: !openedSlidables.contains(index),
                               ),
                             );
                           },
