@@ -7,6 +7,7 @@ import 'package:habit_tracker/main.dart';
 import 'package:habit_tracker/screens/habit_tabs_screen.dart';
 import 'dart:developer';
 import 'package:flutter_slidable/flutter_slidable.dart';
+import 'package:habit_tracker/components/slidable_extended.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:habit_tracker/screens/habit_settings_screen.dart';
 
@@ -20,6 +21,7 @@ class HabitListScreen extends StatefulWidget {
 class _HabitListScreenState extends State<HabitListScreen> {
   List<Habit> habits = [];
   bool isAddingNewHabit = false;
+  Map<String, bool> openedSlidables = {};
   final TextEditingController _habitNameController = TextEditingController();
 
   final IHabitManager _habitManager = getIt<IHabitManager>();
@@ -181,59 +183,85 @@ class _HabitListScreenState extends State<HabitListScreen> {
                 physics: const NeverScrollableScrollPhysics(),
                 children: [
                   for (int index = 0; index < habits.length; index++)
-                    Slidable(
-                      key: ValueKey(habits[index].id),
-                      endActionPane: ActionPane(
-                        motion: const DrawerMotion(),
-                        dismissible: DismissiblePane(
-                          onDismissed: () =>
-                              _deleteHabit(habits[index], context),
-                        ),
-                        children: [
-                          SlidableAction(
-                            onPressed: (context) async {
-                              await Navigator.of(context).push(
-                                PageRouteBuilder(
-                                  pageBuilder: (context, animation,
-                                          secondaryAnimation) =>
-                                      HabitSettingsScreen(habit: habits[index]),
-                                ),
-                              );
-
-                              setState(() {});
-                            },
-                            backgroundColor: Colors.grey,
-                            foregroundColor: Colors.white,
-                            icon: CupertinoIcons.settings,
-                            borderRadius: BorderRadius.circular(12),
-                            padding: const EdgeInsets.symmetric(horizontal: 5),
-                            label: 'Settings',
-                          ),
-                          SlidableAction(
-                            onPressed: (context) =>
-                                _deleteHabit(habits[index], context),
-                            backgroundColor: Colors.red,
-                            foregroundColor: Colors.white,
-                            icon: CupertinoIcons.delete,
-                            borderRadius: BorderRadius.circular(12),
-                            padding: const EdgeInsets.symmetric(horizontal: 5),
-                            label: 'Delete',
-                          ),
-                        ],
+                    Container(
+                      margin: const EdgeInsets.symmetric(
+                        vertical: 8,
+                        horizontal: 16,
                       ),
-                      child: GestureDetector(
-                        onTap: () async {
-                          if (!isAddingNewHabit) {
-                            var result = await Navigator.of(context)
-                                .push(_openListScreen(index));
-                            if (result == 'reload') {
-                              loadHabits();
-                            }
-                          } else {
-                            _cancelAddHabit();
-                          }
+                      key: ValueKey(habits[index].id),
+                      child: SlidableExtended(
+                        onChange: (isOpen) {
+                          setState(
+                              () => openedSlidables[habits[index].id] = isOpen);
                         },
-                        child: HabitCard(habit: habits[index]),
+                        key: ValueKey(habits[index].id),
+                        endActionPane: ActionPane(
+                          motion: const DrawerMotion(),
+                          dismissible: DismissiblePane(
+                            onDismissed: () =>
+                                _deleteHabit(habits[index], context),
+                          ),
+                          children: [
+                            SlidableAction(
+                              onPressed: (context) async {
+                                await Navigator.of(context).push(
+                                  PageRouteBuilder(
+                                    pageBuilder: (context, animation,
+                                            secondaryAnimation) =>
+                                        HabitSettingsScreen(
+                                      habit: habits[index],
+                                    ),
+                                  ),
+                                );
+
+                                setState(() {});
+                              },
+                              backgroundColor: Colors.grey,
+                              foregroundColor: Colors.white,
+                              icon: CupertinoIcons.settings,
+                              padding:
+                                  const EdgeInsets.symmetric(horizontal: 5),
+                              label: 'Settings',
+                            ),
+                            SlidableAction(
+                              onPressed: (context) =>
+                                  _deleteHabit(habits[index], context),
+                              backgroundColor: Colors.red,
+                              foregroundColor: Colors.white,
+                              icon: CupertinoIcons.delete,
+                              borderRadius: const BorderRadius.only(
+                                topRight: Radius.circular(12),
+                                bottomRight: Radius.circular(12),
+                              ),
+                              padding:
+                                  const EdgeInsets.symmetric(horizontal: 5),
+                              label: 'Delete',
+                            ),
+                          ],
+                        ),
+                        child: LayoutBuilder(
+                          builder: (contextFromLayoutBuilder, constraints) {
+                            return GestureDetector(
+                              onTap: () async {
+                                if (!isAddingNewHabit) {
+                                  var result = await Navigator.of(context)
+                                      .push(_openListScreen(index));
+                                  if (result == 'reload') {
+                                    loadHabits();
+                                  }
+                                } else {
+                                  _cancelAddHabit();
+                                }
+                              },
+                              child: HabitCard(
+                                habit: habits[index],
+                                borderRounded:
+                                    !(openedSlidables[habits[index].id] ??
+                                        false),
+                              ),
+                            );
+                          },
+                        ),
                       ),
                     ),
                   if (isAddingNewHabit)
