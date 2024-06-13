@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:habit_tracker/components/habit_streak.dart';
+import 'package:habit_tracker/components/streak_challenge.dart';
 import 'package:habit_tracker/data/models/habit.dart';
 import 'package:habit_tracker/components/custom_calendar.dart';
 import 'package:habit_tracker/components/total_days.dart';
@@ -78,6 +79,7 @@ class _HabitDetailScreenState extends State<HabitDetailScreen> {
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
+                StreakChallenge(habit: widget.habit),
                 TotalDays(
                   habit: widget.habit,
                   date: _currentMonth,
