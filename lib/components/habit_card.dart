@@ -13,7 +13,12 @@ class HabitCard extends StatelessWidget {
   Widget build(BuildContext context) {
     return Container(
       decoration: BoxDecoration(
-        borderRadius: borderRounded ? BorderRadius.circular(12) : null,
+        borderRadius: borderRounded
+            ? BorderRadius.circular(12)
+            : const BorderRadius.only(
+                topLeft: Radius.circular(12),
+                bottomLeft: Radius.circular(12),
+              ),
         color: Colors.white.withOpacity(0.1),
       ),
       height: 70,

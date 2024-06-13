@@ -7,6 +7,7 @@ import 'package:habit_tracker/main.dart';
 import 'package:habit_tracker/screens/habit_tabs_screen.dart';
 import 'dart:developer';
 import 'package:flutter_slidable/flutter_slidable.dart';
+import 'package:habit_tracker/components/slidable_extended.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:habit_tracker/screens/habit_settings_screen.dart';
 
@@ -20,7 +21,7 @@ class HabitListScreen extends StatefulWidget {
 class _HabitListScreenState extends State<HabitListScreen> {
   List<Habit> habits = [];
   bool isAddingNewHabit = false;
-  Set<int> openedSlidables = {};
+  Map<String, bool> openedSlidables = {};
   final TextEditingController _habitNameController = TextEditingController();
 
   final IHabitManager _habitManager = getIt<IHabitManager>();
@@ -188,7 +189,11 @@ class _HabitListScreenState extends State<HabitListScreen> {
                         horizontal: 16,
                       ),
                       key: ValueKey(habits[index].id),
-                      child: Slidable(
+                      child: SlidableExtended(
+                        onChange: (isOpen) {
+                          setState(
+                              () => openedSlidables[habits[index].id] = isOpen);
+                        },
                         key: ValueKey(habits[index].id),
                         endActionPane: ActionPane(
                           motion: const DrawerMotion(),
@@ -248,24 +253,11 @@ class _HabitListScreenState extends State<HabitListScreen> {
                                   _cancelAddHabit();
                                 }
                               },
-                              onHorizontalDragUpdate: (details) {
-                                final slidable =
-                                    Slidable.of(contextFromLayoutBuilder);
-                                if (details.delta.dx > 0) {
-                                  slidable?.close();
-                                  setState(() => openedSlidables.remove(index));
-                                }
-
-                                if (details.delta.dx < 0) {
-                                  slidable?.openEndActionPane();
-                                  setState(() => openedSlidables.add(index));
-                                }
-
-                                log('Opened slidables: $openedSlidables');
-                              },
                               child: HabitCard(
                                 habit: habits[index],
-                                borderRounded: !openedSlidables.contains(index),
+                                borderRounded:
+                                    !(openedSlidables[habits[index].id] ??
+                                        false),
                               ),
                             );
                           },
