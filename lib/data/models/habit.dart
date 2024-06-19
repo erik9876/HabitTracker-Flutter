@@ -63,6 +63,14 @@ class Habit {
     streak = streakCount;
   }
 
+  int getFreezes() {
+    int freezes = streak ~/ 30;
+    freezes += streak >= 7 ? 1 : 0;
+    freezes += streak >= 14 ? 1 : 0;
+
+    return freezes;
+  }
+
   int getTotalCompletedDatesInMonth(DateTime date) {
     DateTime firstDayOfMonth = DateTime(date.year, date.month, 0);
     DateTime lastDayOfMonth = DateTime(date.year, date.month + 1, 1);

@@ -6,6 +6,7 @@ import 'package:habit_tracker/components/custom_calendar.dart';
 import 'package:habit_tracker/components/total_days.dart';
 import 'package:habit_tracker/data/services/habit_manager.dart';
 import 'package:habit_tracker/main.dart';
+import 'package:habit_tracker/components/habit_freeze.dart';
 
 class HabitDetailScreen extends StatefulWidget {
   final Habit habit;
@@ -65,6 +66,10 @@ class _HabitDetailScreenState extends State<HabitDetailScreen> {
               Row(
                 children: [
                   HabitStreak(habit: widget.habit),
+                  const SizedBox(
+                    width: 10,
+                  ),
+                  HabitFreeze(habit: widget.habit),
                 ],
               )
             ],
