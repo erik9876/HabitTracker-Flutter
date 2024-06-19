@@ -265,11 +265,17 @@ class _HabitListScreenState extends State<HabitListScreen> {
                       ),
                     ),
                   if (isAddingNewHabit)
-                    HabitInputCard(
+                    Container(
                       key: const ValueKey('input_card'),
-                      habitNameController: _habitNameController,
-                      onSave: _saveHabit,
-                      onCancel: _cancelAddHabit,
+                      margin: const EdgeInsets.symmetric(
+                        vertical: 8,
+                        horizontal: 16,
+                      ),
+                      child: HabitInputCard(
+                        habitNameController: _habitNameController,
+                        onSave: _saveHabit,
+                        onCancel: _cancelAddHabit,
+                      ),
                     ),
                 ],
               ),
