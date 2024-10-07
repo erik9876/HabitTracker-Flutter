@@ -12,9 +12,10 @@ This project was created to learn **Flutter** and **Dart**.
 - **(Planned)** **Streak Freezes**: Get rewarded if you complete your habits often enough in a row or meet other criteria, earning streak freezes (allowing you to maintain streaks even if you miss one day).
 
 ## Screenshots
-
-![habit list view](assets/images/habit_list_screenshot.png)
-![habit detail view](assets/images/habit_detail_screenshot.png)
+<div>  
+   <img src="assets/images/habit_list_screenshot.png" alt="habit list view" width="300"/>
+   <img src="assets/images/habit_detail_screenshot.png" alt="habit detail view" width="300"/>
+</div>
 
 ## Installation
 
